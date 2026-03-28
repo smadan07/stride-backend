@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.T.R.I.D.E 3.0 - Security Terminal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f1115;
+            --accent-green: #00ff88;
+            --accent-warning: #ffb700;
+            --accent-danger: #ff0055;
+            --glass-bg: rgba(20, 25, 30, 0.7);
+            --text-main: #f0f0f0;
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1e26 100%);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        .dashboard {
+            display: flex;
+            height: 100vh;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            max-width: 650px;
+            width: 90%;
+            text-align: center;
+            z-index: 10;
+        }
+
+        h1 {
+            font-weight: 900;
+            margin-top: 0;
+            font-size: 2.5rem;
+            letter-spacing: -1px;
+            background: linear-gradient(90deg, #fff, #999);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            color: #a0aab5;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .auth-zone {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            text-align: left;
+        }
+
+        textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: white;
+            padding: 15px;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+        }
+
+        /* LIVE TELEMETRY HUD */
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid var(--accent-green);
+            transition: all 0.3s;
+        }
+
+        .hud-metric {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .hud-metric span.label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #777;
+            font-weight: 600;
+        }
+
+        .hud-metric span.value {
+            font-size: 1.25rem;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hud-log {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #a0aab5;
+            margin-top: 15px;
+            text-align: left;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 5px;
+            height: 60px;
+            overflow-y: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .status-led {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-green);
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .pulse-ring {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border: 2px solid rgba(0, 255, 136, 0.1);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: expand 4s infinite linear;
+            z-index: 1;
+        }
+
+        .pulse-ring:nth-child(2) { animation-delay: 2s; }
+
+        @keyframes expand {
+            0% { width: 300px; height: 300px; opacity: 1; }
+            100% { width: 1200px; height: 1200px; opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="pulse-ring" id="ring1"></div>
+    <div class="pulse-ring" id="ring2"></div>
+
+    <div class="dashboard">
+        <div class="glass-panel">
+            <div style="display:flex; justify-content:center; align-items:center; margin-bottom: 20px;">
+                <div class="status-led" id="top-led"></div>
+                <span id="top-status-text" style="font-weight:600; font-size: 0.9rem; letter-spacing: 2px; text-transform:uppercase;">Zero-Trust Engine Active</span>
+            </div>
+            
+            <h1>S.T.R.I.D.E 3.0</h1>
+            
+            <p>Welcome to the Hackathon Presentation.<br>The background agent is dynamically tracking your biometric baseline using mouse trajectory and keystroke flow.</p>
+            
+            <div class="auth-zone">
+                <span style="font-size: 0.8rem; text-transform:uppercase; color: #777; font-weight:600;">Secure Input Simulator</span>
+                <textarea rows="4" placeholder="Type naturally here to verify your biometrics. Once the baseline settles, mash your keys wildly to simulate a 'hijack behavior' and trigger the Sandboxed UI lock..."></textarea>
+                
+                <div class="hud" id="hud-panel">
+                    <div class="hud-metric">
+                        <span class="label">State</span>
+                        <span class="value" id="val-state" style="color: var(--accent-green);">SEAMLESS</span>
+                    </div>
+                    <div class="hud-metric">
+                        <span class="label">Risk Score</span>
+                        <span class="value" id="val-risk" style="color: var(--text-main);">0.0 / 100</span>
+                    </div>
+                </div>
+
+                <div class="hud-log" id="xai-log">
+                    <div style="color: #00ff88;">[SYSTEM] ML Inference node standing by...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mount the javascript telemetry collector so it runs in browser -->
+    <script src="/sensor.js"></script>
+</body>
+</html>
