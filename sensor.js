@@ -237,7 +237,7 @@ setInterval(async () => {
 
     // POST Payload to FastAPI
     try {
-        const response = await fetch('https://stride-api.onrender.com/telemetry', {
+        const response = await fetch('https://stride-api-28vq.onrender.com/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
